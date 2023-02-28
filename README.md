@@ -1,5 +1,9 @@
 # VQACL: A Novel Visual Question Answering Continual Learning Setting
 
+We establish a novel VQA Continual Learning setting named VQACL, which contains two key components: a dual-level task sequence where visual and linguistic data are nested, and a novel composition testing containing new skill-concept combinations. The former devotes to simulating the ever-changing multimodal datastream in real world and the latter aims at measuring models’ generalizability for cognitive reasoning.
+
+To do the VQACL, we also propose a novel representation learning method, which leverages a sample-specific and a sample-invariant feature to learn
+representations that are both discriminative and generalizable for VQA.
 
 ## Setup
 ```bash
@@ -46,8 +50,17 @@ python download_backbones.py
 ## VQACL tasks
 
 ```bash
-# Testing with 4 gpus
+# Training with 1 gpu
+cd VL-T5/
+bash scripts/VQACL_train.sh 1 # Standard Training
+bash scripts/VQACL_COMP_train.sh 1 # Training for Novel Composition Testing (Group-5)
+
+# Testing with 1 gpu
 cd VL-T5/
 bash scripts/VQACL.sh 1 # Standard Testing
 bash scripts/VQACL_COMP.sh 1 # Novel Composition Testing (Group-5)
 ```
+
+## Acknowledgement
+
+Our model is based on the official [VL-T5](https://github.com/j-min/VL-T5) repository, we thank the authors to release their code. If you use the related part, please cite the corresponding paper commented in the code.
