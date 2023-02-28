@@ -1,0 +1,17 @@
+torch==1.6.0
+transformers==4.2.1
+sentencepiece
+h5py
+wandb
+tqdm
+numpy
+pandas
+matplotlib
+pyyaml
+sacrebleu
+git+https://github.com/j-min/language-evaluation@master
+torchvision==0.7.0
+wget
+
+
+
