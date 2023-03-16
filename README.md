@@ -60,6 +60,17 @@ cd VL-T5/
 bash scripts/VQACL.sh 1 # Standard Testing
 bash scripts/VQACL_COMP.sh 1 # Novel Composition Testing (Group-5)
 ```
+## Citation
+```
+@InProceedings{zhang2023vqacl,
+    author    = {Xiao, Junbin and Shang, Xindi and Yao, Angela and Chua, Tat-Seng},
+    title     = {NExT-QA: Next Phase of Question-Answering to Explaining Temporal Actions},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month     = {June},
+    year      = {2021},
+    pages     = {9777-9786}
+}
+```
 
 ## Acknowledgement
 
