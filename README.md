@@ -25,7 +25,7 @@ python download_backbones.py
 ./datasets
     COCO/
         images/
-        featuers/
+        features/
     vqa/
         Paritition_Q/
     nextqa/
@@ -46,20 +46,21 @@ python download_backbones.py
 ```
 
 ## Dataset Preparation / Model checkpoint
-- Download `datasets/COCO` and `datasets/vqa` from [Google Drive](https://drive.google.com/drive/folders/1MBBhlkP83VMKS2Qe0SmFfzkHhMpIG5wf?usp=sharing)
 - Download the VQACL partition of NExT-QA from [Google Drive](https://drive.google.com/file/d/1lwWL_PhNKactFEqQF8IVx-HeJEuboe8D/view?usp=share_link) and put it into datasets/vqa/Partition_Q.
 - Download the VQACL partition of VQA-v2 from [Google Drive](https://drive.google.com/file/d/1ubCHBZ5n2dOx7KVXJX57kRAgZLI4qK_H/view?usp=share_link) and put it into datasets/nextqa/Partition_Q.
+- Download `datasets/COCO` from [Google Drive](https://drive.google.com/drive/folders/1MBBhlkP83VMKS2Qe0SmFfzkHhMpIG5wf?usp=sharing)
+- Download video features of NExT-QA from [Goolge Drive](https://drive.google.com/file/d/1rS5X_t_VSDF4uP3HL1gPQ0ZgWIEuglgk/view?usp=share_link) and put it into datatsets/nextqa/
 - Download model checkpoints from [Google Drive](https://drive.google.com/drive/folders/1GDI9uG9OSQk0ObEaEJI3C6eKcDzh0yGp?usp=share_link)
 
 ## VQACL tasks
 
 ```bash
-# Training with 1 gpu
+# Training with 1 gpu for VQA v2
 cd VL-T5/
 bash scripts/VQACL_train.sh 1 # Standard Training
 bash scripts/VQACL_COMP_train.sh 1 # Training for Novel Composition Testing (Group-5)
 
-# Testing with 1 gpu
+# Testing with 1 gpu for VQA v2
 cd VL-T5/
 bash scripts/VQACL.sh 1 # Standard Testing
 bash scripts/VQACL_COMP.sh 1 # Novel Composition Testing (Group-5)
