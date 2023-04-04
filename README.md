@@ -46,8 +46,8 @@ python download_backbones.py
 ```
 
 ## Dataset Preparation / Model checkpoint
+- Download the VQACL partition of VQA v2 from [Google Drive](https://drive.google.com/file/d/11gx7AxyeMP1KVuzHErIfNKCLeBWGq3pE/view?usp=share_link) and put it into datasets/nextqa/Partition_Q.
 - Download the VQACL partition of NExT-QA from [Google Drive](https://drive.google.com/file/d/1lwWL_PhNKactFEqQF8IVx-HeJEuboe8D/view?usp=share_link) and put it into datasets/vqa/Partition_Q.
-- Download the VQACL partition of VQA-v2 from [Google Drive](https://drive.google.com/file/d/1ubCHBZ5n2dOx7KVXJX57kRAgZLI4qK_H/view?usp=share_link) and put it into datasets/nextqa/Partition_Q.
 - Download `datasets/COCO` from [Google Drive](https://drive.google.com/drive/folders/1MBBhlkP83VMKS2Qe0SmFfzkHhMpIG5wf?usp=sharing)
 - Download video features of NExT-QA from [Goolge Drive](https://drive.google.com/file/d/1rS5X_t_VSDF4uP3HL1gPQ0ZgWIEuglgk/view?usp=share_link) and put it into datatsets/nextqa/
 - Download model checkpoints from [Google Drive](https://drive.google.com/drive/folders/1GDI9uG9OSQk0ObEaEJI3C6eKcDzh0yGp?usp=share_link)
