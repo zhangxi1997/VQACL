@@ -1,5 +1,5 @@
 # The name of experiment
-name=VQAv2_Our
+name=checkpoint_comp
 
 output=snap/$name
 
@@ -7,8 +7,8 @@ output=snap/$name
 PYTHONPATH=$PYTHONPATH:./src \
 python -m torch.distributed.launch \
     --nproc_per_node=$1 \
-    --master_port 66666 \
-    src/vqacl.py \
+    --master_port 66662 \
+    src/vqacl_comp.py \
         --distributed --multiGPU \
         --train karpathy_train \
         --valid karpathy_val \
@@ -24,4 +24,6 @@ python -m torch.distributed.launch \
         --num_beams 5 \
         --batch_size 80 \
         --valid_batch_size 100 \
-        --from_scratch
+        --from_scratch \
+        --comp_cate G5 \
+        --now_train
