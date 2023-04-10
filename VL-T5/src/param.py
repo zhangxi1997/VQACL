@@ -184,6 +184,11 @@ def parse_args(parse=True, **optional_kwargs):
     parser.add_argument("--ewc_loss_weight", type=float, default=100.0)
     parser.add_argument("--lambda_neighbor", type=float, default=10)
     parser.add_argument("--reg_lambda", type=float, default=10000)
+    parser.add_argument("--now_train", action='store_true')
+
+
+    parser.add_argument("--proto_alpha", type=float, default=0.5)
+    parser.add_argument("--proto_beta", type=float, default=0.3)
 
 
 
