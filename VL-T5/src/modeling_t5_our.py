@@ -171,6 +171,7 @@ class JointEncoder(T5Stack):
         self.embed_tokens = new_embeddings
         self.visual_embedding.obj_order_embedding = new_embeddings
 
+
     def forward(
         self,
         input_ids=None,
@@ -190,7 +191,7 @@ class JointEncoder(T5Stack):
         return_dict=None,
     ):
 
-        if inputs_embeds is None: #  文本
+        if inputs_embeds is None:
             assert self.embed_tokens is not None, "You have to initialize the model with valid token embeddings"
             inputs_embeds = self.embed_tokens(input_ids)
 
@@ -248,10 +249,10 @@ class JointEncoder(T5Stack):
         if self.config.num_layers > 0:
             assert self.block[0].layer[0].SelfAttention.has_relative_attention_bias
 
-            seq_length = L + V_L  # L=20, V_L=36 --------------------------------- here
+            seq_length = L + V_L
 
-            q_len = seq_length  # 56 + x
-            k_len = seq_length  # 56 + x
+            q_len = seq_length
+            k_len = seq_length
 
             # [1, n_heads, Q_len, K_len]
             text_position_bias = self.block[0].layer[0].SelfAttention.compute_bias(L, L)
@@ -387,7 +388,6 @@ class VLT5(T5ForConditionalGeneration):
         self.model_parallel = False
         self.device_map = None
 
-
         self.Q_task_mem_proto = {}
         self.V_task_mem_proto = {}
         self.Q_task_cur_proto = {}
@@ -462,6 +462,55 @@ class VLT5(T5ForConditionalGeneration):
         return selected_prototype, max_idx, acc
 
 
+    def update_prototype(self, current_Q_prototype, current_V_prototype, current_num_Q, current_num_V, current_task_id, proto_alpha, proto_beta):
+
+        if current_task_id not in self.Q_task_cur_proto:
+            self.Q_task_cur_proto[current_task_id] = current_Q_prototype
+            self.Q_prototype_num = current_num_Q
+            self.V_prototype_num = current_num_V
+            self.V_prototype = current_V_prototype
+            if current_task_id == 0:
+                self.Q_prototype = current_Q_prototype
+            else:
+                self.Q_prototype[current_task_id] = current_Q_prototype[current_task_id]
+        else:
+
+            self.Q_task_cur_proto[current_task_id] = current_Q_prototype
+
+            if current_task_id != 0:
+                if current_task_id not in self.Q_task_mem_proto:
+                    current_Q_prototype_mem = current_Q_prototype.clone()
+                    current_Q_prototype_mem[current_task_id] = 0
+                    self.Q_task_mem_proto[current_task_id] = current_Q_prototype_mem
+                else:
+                    current_Q_prototype_mem = current_Q_prototype.clone()
+                    current_Q_prototype_mem[current_task_id] = 0
+                    self.Q_task_mem_proto[current_task_id] = proto_alpha*self.Q_task_mem_proto[current_task_id] + (1-proto_alpha)*current_Q_prototype_mem.detach()
+
+                self.Q_prototype = self.Q_task_mem_proto[current_task_id].detach()
+                self.Q_prototype[current_task_id] = self.Q_task_cur_proto[current_task_id][current_task_id].detach()
+            else:
+                self.Q_prototype = self.Q_task_cur_proto[current_task_id]
+
+
+            self.V_prototype = proto_beta*self.V_prototype + (1-proto_beta)*current_V_prototype
+            self.Q_prototype_num = self.Q_prototype_num.detach() + current_num_Q
+            self.V_prototype_num = self.V_prototype_num.detach() + current_num_V
+
+    def calculate_current_prototype(self, fc_hidden_Q, labels):
+        fc_hidden_Q = torch.mean(fc_hidden_Q, dim=1)  # ---- mean-pooling
+
+        div_item_ = torch.sum(labels, dim=0).unsqueeze(1).repeat(1, 768)  # [num_classes1, dim]
+        ones = torch.ones((labels.shape[1], fc_hidden_Q.shape[-1])).to(torch.device('cuda'))  # [num_classes1, dim]
+        div_item = torch.where(div_item_ <= 0, ones, div_item_)
+
+        current_prototype_Q = torch.matmul(torch.transpose(labels, 0, 1),
+                                           fc_hidden_Q) / div_item  # [num_classes1, dim]
+
+        current_num = torch.sum(labels, dim=0)
+        return current_prototype_Q, current_num
+
+
     def forward(
         self,
         input_ids=None,
@@ -518,13 +567,49 @@ class VLT5(T5ForConditionalGeneration):
 
         hidden_states = encoder_outputs[0] # [bs, L+V_L, 768]
 
+        if 'cate_labels' in kwargs:
+            cate_labels = kwargs['cate_labels']  # [bs, num_classes]
+        if 'ques_labels' in kwargs:
+            ques_labels = kwargs['ques_labels']  # [bs, num_classes]
 
+        if 'proto_alpha' in kwargs:
+            proto_alpha = kwargs['proto_alpha']
+        if 'proto_beta' in kwargs:
+            proto_beta = kwargs['proto_beta']
 
-        retrievaled_Q_proto, max_idx_Q, acc_Q = self.cosine_similarity_multi(self.Q_prototype, torch.mean(hidden_states[:, :self.L, :], dim=1))  # [bs, 768]
-        retrievaled_Q_proto = retrievaled_Q_proto.unsqueeze(1)  # [bs, 1, 768]
-        retrievaled_V_proto, max_idx_V, acc_V = self.cosine_similarity_multi(self.V_prototype, torch.mean(hidden_states[:, self.L:, :], dim=1))  # [bs, 768]
-        retrievaled_V_proto = retrievaled_V_proto.unsqueeze(1)  # [bs, 1, 768]
-        loss_memory_Q, loss_memory_V = 0, 0
+        if 'current_task_id' in kwargs:
+            current_task_id = kwargs['current_task_id']
+
+        if 'proto_update' in kwargs and kwargs['proto_update']:  # only for training
+
+            current_prototype_Q, current_num_Q = self.calculate_current_prototype(hidden_states[:, :self.L, :],
+                                                                                  ques_labels)
+            current_prototype_V, current_num_V = self.calculate_current_prototype(hidden_states[:, self.L:, :],
+                                                                                  cate_labels)
+
+            if 'memory' in kwargs and kwargs['memory'] == True:
+                loss_memory_Q, loss_memory_V = self.memory_loss(hidden_states[:, :self.L, :],
+                                                                hidden_states[:, self.L:, :], ques_labels, cate_labels)
+            else:
+                loss_memory_Q, loss_memory_V = 0, 0
+
+            # update prototype
+            self.update_prototype(current_prototype_Q, current_prototype_V, current_num_Q, current_num_V,
+                                  current_task_id, proto_alpha, proto_beta)
+
+            # retrieval the most relevant prototype
+            retrievaled_Q_proto, max_idx_Q, acc_Q = self.cosine_similarity_multi(self.Q_prototype, torch.mean(
+                hidden_states[:, :self.L, :], dim=1), ques_labels)  # [bs, 768]
+            retrievaled_Q_proto = retrievaled_Q_proto.unsqueeze(1)  # [bs, 1, 768]
+            retrievaled_V_proto, max_idx_V, acc_V = self.cosine_similarity_multi(self.V_prototype, torch.mean(
+                hidden_states[:, self.L:, :], dim=1), cate_labels)  # [bs, 768]
+            retrievaled_V_proto = retrievaled_V_proto.unsqueeze(1)  # [bs, 1, 768]
+        else:
+            retrievaled_Q_proto, max_idx_Q, acc_Q = self.cosine_similarity_multi(self.Q_prototype, torch.mean(hidden_states[:, :self.L, :], dim=1))  # [bs, 768]
+            retrievaled_Q_proto = retrievaled_Q_proto.unsqueeze(1)  # [bs, 1, 768]
+            retrievaled_V_proto, max_idx_V, acc_V = self.cosine_similarity_multi(self.V_prototype, torch.mean(hidden_states[:, self.L:, :], dim=1))  # [bs, 768]
+            retrievaled_V_proto = retrievaled_V_proto.unsqueeze(1)  # [bs, 1, 768]
+            loss_memory_Q, loss_memory_V = 0, 0
 
 
         hidden_states = torch.cat((hidden_states, retrievaled_Q_proto.detach(), retrievaled_V_proto.detach()), dim=1)
