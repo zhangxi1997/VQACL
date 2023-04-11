@@ -22,11 +22,11 @@ In conclusion, on the one hand, our VQACL setting requires models to perform eff
 
 We also propose a novel representation learning method for VQACL, which introduces a **sample-specific** (SS) and a **sample-invariant** (SI) feature to learn better representations that are both discriminative and generalizable. Specifically, the SS feature is learned through a transformer encoder, which can encode the most attractive and salient contents to make it discriminative. For the SI feature, we resort to prototype learning to aggregate object class or question type information. Because category knowledge is stable and representative across different scenarios, the SI feature can possess strong generalizability.
 
-<img src="figure3.png" width="400px" alt="Figure e">
+<img src="figure3.png" width="400px" alt="Figure 3">
 
 During experiments, as shown in Table 1, we re-purpose and evaluate 5 well-known continual learning methods. The results indicate these models struggle to obtain satisfactory results. Remarkably, our model consistently achieves the best performance, demonstrating the effectiveness and compositionality of our approach.
 
-![Table 1](table.png)
+<img src="table.png" width="600px" alt="Table 1">
 
 ## Setup
 ```bash
