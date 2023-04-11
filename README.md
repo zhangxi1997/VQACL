@@ -10,6 +10,7 @@
 These years, most existing continual learning works focus on unimodal tasks such as image classification, and paid little attention to multimodal tasks like visual question answering (VQA). To cope with the constantly emerging real-world multimodal data, a practical AI system should be capable of continually learning from multimodal sources while alleviating forgetting previously learned knowledge.
 
 ![Figure 1](figure1.png =200x)
+<img src="figure1.png" width=30%>
 
 In this paper, we design a novel VQA continual learning setting named VQACL. During the design, we consider two vital issues. 
 First, as shown in Figure 1, the VQA input comes from both vision and linguistic modalities, thus the task setting should tackle multimodal continuous data in a holistic manner. To achieve it, as shown in Figure 2, imitating the cognitive process of children, we define a dual-level task sequence. Specifically, in the outer level, we set up a sequence of linguistic-driven tasks to evaluate for different question types. In the inner level, for each outer level task, we construct a series of randomly ordered visual-driven subtasks according to object categories.
