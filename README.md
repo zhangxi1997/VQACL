@@ -9,7 +9,9 @@ representations that are both discriminative and generalizable for VQA.-->
 
 These years, most existing continual learning works focus on unimodal tasks such as image classification, and paid little attention to multimodal tasks like visual question answering (VQA). To cope with the constantly emerging real-world multimodal data, a practical AI system should be capable of continually learning from multimodal sources while alleviating forgetting previously learned knowledge.
 
-<img src="figure1.png" width="400px" alt="Figure 1">
+
+
+<div align="center"><img src="figure1.png" width="400px" alt="Figure 1"></div>
 
 In this paper, we design **a novel VQA continual learning setting named VQACL**. During the design, we consider two vital issues. 
 First, as shown in Figure 1, the VQA input comes from both vision and linguistic modalities, thus the task setting should tackle multimodal continuous data in a holistic manner. To achieve it, as shown in Figure 2, imitating the cognitive process of children, we define a **dual-level task sequence**. Specifically, in the outer level, we set up a sequence of linguistic-driven tasks to evaluate for different question types. In the inner level, for each outer level task, we construct a series of randomly ordered visual-driven subtasks according to object categories.
@@ -22,11 +24,11 @@ In conclusion, on the one hand, our VQACL setting requires models to perform eff
 
 We also propose a novel representation learning method for VQACL, which introduces a **sample-specific** (SS) and a **sample-invariant** (SI) feature to learn better representations that are both discriminative and generalizable. Specifically, the SS feature is learned through a transformer encoder, which can encode the most attractive and salient contents to make it discriminative. For the SI feature, we resort to prototype learning to aggregate object class or question type information. Because category knowledge is stable and representative across different scenarios, the SI feature can possess strong generalizability.
 
-<img src="figure3.png" width="400px" alt="Figure 3">
+<div align="center"><img src="figure3.png" width="400px" alt="Figure 3"></div>
 
 During experiments, as shown in Table 1, we re-purpose and evaluate 5 well-known continual learning methods. The results indicate these models struggle to obtain satisfactory results. Remarkably, our model consistently achieves the best performance, demonstrating the effectiveness and compositionality of our approach.
 
-<img src="table.png" width="600px" alt="Table 1">
+<div align="center"><img src="table.png" width="600px" alt="Table 1"></div>
 
 ## Setup
 ```bash
