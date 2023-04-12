@@ -26,10 +26,10 @@ Category_splits = {'G1': [58, 48, 55, 36, 64, 1, 70, 73, 42, 15, 6, 18, 49, 59, 
 
 import json
 
-with open('/data/zhangxi/vqa/QuesId_task_map.json') as fp:
+with open('datasets/QuesId_task_map.json') as fp:
     QuesId_task_map = json.load(fp)
 
-with open('/data/zhangxi/vqa/ImgId_cate_map.json') as fp:
+with open('datasets/ImgId_cate_map.json') as fp:
     ImgId_cate_map = json.load(fp)
 
 print("Success to load the QuesId_task_map and QuesId_task_map")
