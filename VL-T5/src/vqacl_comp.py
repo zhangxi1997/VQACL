@@ -707,7 +707,7 @@ def main_worker(gpu, args):
 
     print(f'Building train loader at GPU {gpu}')
 
-    coco_Ours = Comp_task
+    coco_Ours = All_task #['q_causal', 'q_color','q_judge']#All_task
 
 
     trainer = Trainer(args, coco_Ours, train=True)
@@ -768,12 +768,15 @@ def main_worker(gpu, args):
             trainer.Test(load=False)
 
         try:
-            print('#------------------ Final Performance --------------------#')
-            print(trainer.result_matrix['q_causal'])
+            print('#------------------ Final Performance with 6 question types --------------------#')
             acc = 0
-            for key in trainer.result_matrix['q_causal']:
-                acc += trainer.result_matrix['q_causal'][key]
-            print('AP:', round(acc/10, 4))
+            dict_final = {}
+            for key in trainer.result_matrix_comp['q_causal']:
+                if key in Comp_task:
+                    dict_final[key] = trainer.result_matrix_comp['q_causal'][key]
+                    acc += trainer.result_matrix_comp['q_causal'][key]
+            print(dict_final)
+            print('AP:', round(acc/len(Comp_task), 4))
 
         except:
             pass
