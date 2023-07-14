@@ -143,7 +143,7 @@ class Trainer(TrainerBase):
         self.task_total_num = torch.zeros(len(self.task_list))
 
         self.M = args.m_size
-        self.Examplar_set = {'G0':[], 'G1':[], 'G2':[], 'G3':[], 'G4':[]}
+        self.Examplar_set = {'G1':[], 'G2':[], 'G3':[], 'G4':[], 'G5':[]}
         self.composition_test_cate = args.comp_cate
 
 
