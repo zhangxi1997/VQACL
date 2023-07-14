@@ -707,7 +707,7 @@ def main_worker(gpu, args):
 
     print(f'Building train loader at GPU {gpu}')
 
-    coco_Ours = ['q_causal', 'q_color','q_judge']#All_task
+    coco_Ours = Comp_task
 
 
     trainer = Trainer(args, coco_Ours, train=True)
