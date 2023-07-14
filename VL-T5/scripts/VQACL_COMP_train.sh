@@ -26,4 +26,6 @@ python -m torch.distributed.launch \
         --valid_batch_size 100 \
         --from_scratch \
         --comp_cate G5 \
+        --memory \
+        --m_size 5000 \
         --now_train
