@@ -556,8 +556,9 @@ class Trainer(TrainerBase):
             os.mkdir(self.args.output)
         last_path = os.path.join(self.args.output, task + '_LAST')
         self.load(last_path)
-        self.model.module.Q_prototype = torch.load(self.args.output + '/Q_prototype.pt')
-        self.model.module.V_prototype = torch.load(self.args.output + '/V_prototype.pt')
+        if not self.args.now_train:
+            self.model.module.Q_prototype = torch.load(self.args.output + '/Q_prototype.pt')
+            self.model.module.V_prototype = torch.load(self.args.output + '/V_prototype.pt')
 
         # =========== test for all previous tasks
         Flag = 1
